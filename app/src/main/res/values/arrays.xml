@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="data_types_array">
+        <item>None</item>
+        <item>2G</item>
+        <item>3G</item>
+        <item>4G</item>
+        <item>5G</item>
+    </string-array>
+</resources>

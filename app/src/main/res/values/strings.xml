@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Data Notify</string>
+
+    <string name="data_reminder">Data reminder</string>
+    <string name="reminder_notification">Your data type has changed</string>
+    <string name="service_notification_prefix">You will be notified when you have\ </string>
+    <string name="notification_channel_desc">Reminds you when your data has changed</string>
+    <string name="you_have">You have\ </string>
+    <string name="no_data">no data</string>
+
+    <string name="notify_me_when">Notify me when if have\ </string>
+    <string name="or_better">or better</string>
+    <string name="or_better_maj">Or better</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preferences -->
+    <string name="preference_title">Default values for quick settings tile</string>
+    <string name="min_data_level">Minimum data level</string>
+
+    <string name="min_data_level_key">MINIMUM_DATA_LEVEL_KEY</string>
+    <string name="or_better_key">OR_BETTER_KEY</string>
+
+</resources>
