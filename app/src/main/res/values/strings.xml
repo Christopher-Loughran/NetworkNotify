@@ -7,6 +7,7 @@
     <string name="notification_channel_desc">Reminds you when your data has changed</string>
     <string name="you_have">You have\ </string>
     <string name="no_data">no data</string>
+    <string name="no_mobile_data">no mobile data</string>
 
     <string name="notify_me_when">Notify me when if have\ </string>
     <string name="or_better">or better</string>

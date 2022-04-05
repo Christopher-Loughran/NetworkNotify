@@ -104,7 +104,7 @@ public class DataChecker extends Service {
             }
         }
         else{
-            serviceNotificationText += getString(R.string.no_data);
+            serviceNotificationText += getString(R.string.no_mobile_data);
         }
 
         onStarted();
@@ -157,13 +157,13 @@ public class DataChecker extends Service {
                         break;
                     default:
                         if (minDataLevel == 0){
-                            success(getString(R.string.you_have) + "no mobile data");
+                            success(getString(R.string.you_have) + getString(R.string.no_mobile_data));
                         }
                 }
             }
             else{
                 if (minDataLevel == 0){
-                    success(getString(R.string.you_have) + "no mobile data");
+                    success(getString(R.string.you_have) + getString(R.string.no_mobile_data));
                 }
             }
             try{
