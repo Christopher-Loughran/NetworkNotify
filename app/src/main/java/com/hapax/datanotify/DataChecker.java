@@ -1,4 +1,4 @@
-package com.example.datanotify;
+package com.hapax.datanotify;
 
 import static android.telephony.TelephonyManager.NETWORK_TYPE_1xRTT;
 import static android.telephony.TelephonyManager.NETWORK_TYPE_CDMA;

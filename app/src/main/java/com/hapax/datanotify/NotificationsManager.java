@@ -1,4 +1,4 @@
-package com.example.datanotify;
+package com.hapax.datanotify;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

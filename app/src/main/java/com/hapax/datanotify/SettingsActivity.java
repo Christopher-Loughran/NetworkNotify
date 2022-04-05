@@ -1,4 +1,4 @@
-package com.example.datanotify;
+package com.hapax.datanotify;
 
 import android.content.Intent;
 import android.os.Bundle;

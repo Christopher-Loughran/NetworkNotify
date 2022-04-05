@@ -1,8 +1,7 @@
-package com.example.datanotify;
+package com.hapax.datanotify;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
