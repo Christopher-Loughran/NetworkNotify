@@ -1,15 +1,11 @@
 package com.hapax.datanotify;
 
-import android.app.ActivityManager;
-import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.preference.PreferenceManager;
 
@@ -27,26 +23,32 @@ public class QuickTile extends TileService {
 
     @Override
     public void onCreate(){
-        DataChecker.quickTileCallbacks = new DataChecker.QuickTileCallbacks() {
+        NetworkChecker.quickTileCallbacks = new NetworkChecker.QuickTileCallbacks() {
             @Override
             public void onStarted() {
                 setActive(true);
-            }
+            } //the network checker service has started
 
             @Override
             public void onStopped() {
                 setActive(false);
-            }
+            } //the network cheker service has stopped
         };
     }
 
 
     @Override
-    public void onClick() {
+    public void onClick() { //user clicks the quick tile
         super.onClick();
 
         if(!getActive()){ //service is not turned on
-            startDataCheckerService();
+            if(PermissionsManager.checkPermissions(this, PermissionsManager.REQUIRED_PERMISSIONS)){
+                startDataCheckerService();
+            }
+            else{
+                //user has not granted the required permissions, send them to the settings activity so they can grant them.
+                startSettingsActivity();
+            }
         }
         else{
             stopDataCheckerService();
@@ -57,6 +59,13 @@ public class QuickTile extends TileService {
     @Override
     public void onTileAdded() {
         super.onTileAdded();
+        setTileActive(getActive());
+        //start settings activity so the user can accept the required permissions and set their preferred default settings
+        startSettingsActivity();
+    }
+
+
+    public void startSettingsActivity(){
         Intent intent = new Intent(this, SettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -65,7 +74,7 @@ public class QuickTile extends TileService {
 
     public void startDataCheckerService(){
         if (PermissionsManager.checkPermissions(this, PermissionsManager.REQUIRED_PERMISSIONS)) {
-            Intent intent = new Intent(this, DataChecker.class);
+            Intent intent = new Intent(this, NetworkChecker.class);
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             String dataLevel = prefs.getString(getString(R.string.min_data_level_key), "4G");
@@ -92,8 +101,8 @@ public class QuickTile extends TileService {
 
             orBetter = prefs.getBoolean(getString(R.string.or_better_key), true);
 
-            intent.putExtra(DataChecker.MINIMUM_DATA_LEVEL, minDataLevel);
-            intent.putExtra(DataChecker.OR_BETTER, orBetter);
+            intent.putExtra(NetworkChecker.MINIMUM_DATA_LEVEL, minDataLevel);
+            intent.putExtra(NetworkChecker.OR_BETTER, orBetter);
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -105,6 +114,7 @@ public class QuickTile extends TileService {
                 setActive(true);
             }
         } else {
+
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
@@ -112,7 +122,7 @@ public class QuickTile extends TileService {
 
 
     public void stopDataCheckerService(){
-        Intent intent = new Intent(this, DataChecker.class);
+        Intent intent = new Intent(this, NetworkChecker.class);
         stopService(intent);
         setActive(false);
     }
@@ -120,8 +130,8 @@ public class QuickTile extends TileService {
 
     public boolean getActive() {
         SharedPreferences sharedPreferences = getSharedPreferences(TILE_PREFERTENCES, MODE_PRIVATE);
-        boolean inKioskMode = sharedPreferences.getBoolean(ACTIVE_KEY, false); //false as default
-        return inKioskMode;
+        boolean serviceActive = sharedPreferences.getBoolean(ACTIVE_KEY, false); //false as default
+        return serviceActive;
     }
 
 
@@ -135,13 +145,19 @@ public class QuickTile extends TileService {
 
 
     public void setTileActive(boolean active){
-        Tile tile = getQsTile();
-        if(active){
-            tile.setState(Tile.STATE_ACTIVE);
+        try{
+            Tile tile = getQsTile();
+            if(active){
+                tile.setState(Tile.STATE_ACTIVE);
+            }
+            else{
+                tile.setState(Tile.STATE_INACTIVE);
+            }
+            tile.updateTile();
         }
-        else{
-            tile.setState(Tile.STATE_INACTIVE);
+        catch (NullPointerException e){
+            e.printStackTrace();
         }
-        tile.updateTile();
+
     }
 }

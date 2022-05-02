@@ -4,16 +4,13 @@ import androidx.annotation.NonNull;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,6 +25,9 @@ public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 
     private static final int PERMISSIONS_REQUEST_CODE = 2648;
+
+    private static final String TILE_PREFERTENCES = "TILE_PREFERTENCES";
+    private static final String ACTIVE_KEY = "ACTIVE_KEY";
 
     //data checker params
     private int minDataLevel = 3;
@@ -48,14 +48,16 @@ public class MainActivity extends Activity {
 
         NotificationsManager.createNotificationChannel(this);
 
-        DataChecker.mainActivityCallbacks = new DataChecker.MainActivityCallbacks() {
+        NetworkChecker.mainActivityCallbacks = new NetworkChecker.MainActivityCallbacks() {
             @Override
             public void onStarted() {
                 onDataCheckerServiceStarted();
+                setActive(true);
             }
             @Override
             public void onStopped() {
                 onDataCheckerServiceStopped();
+                setActive(false);
             }
         };
 
@@ -110,7 +112,7 @@ public class MainActivity extends Activity {
 
 
         button = findViewById(R.id.start_button);
-        if(!isServiceRunning(DataChecker.class)){
+        if(!isServiceRunning(NetworkChecker.class)){
             button.setText(R.string.start);
         }
         else{
@@ -119,7 +121,7 @@ public class MainActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isServiceRunning(DataChecker.class)){
+                if(!isServiceRunning(NetworkChecker.class)){
                     startDataCheckerService();
                 }
                 else{
@@ -134,7 +136,6 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, SettingsActivity.class);
-                startActivity(intent);
                 try {
                     startActivity(intent);
                 } catch (ActivityNotFoundException e) {
@@ -148,9 +149,9 @@ public class MainActivity extends Activity {
     public void startDataCheckerService(){
         if (PermissionsManager.checkPermissions(this, PermissionsManager.REQUIRED_PERMISSIONS)) {
 
-            Intent intent = new Intent(this, DataChecker.class);
-            intent.putExtra(DataChecker.MINIMUM_DATA_LEVEL, minDataLevel);
-            intent.putExtra(DataChecker.OR_BETTER, orBetter);
+            Intent intent = new Intent(this, NetworkChecker.class);
+            intent.putExtra(NetworkChecker.MINIMUM_DATA_LEVEL, minDataLevel);
+            intent.putExtra(NetworkChecker.OR_BETTER, orBetter);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(intent);
             }
@@ -160,16 +161,16 @@ public class MainActivity extends Activity {
         } else {
             requestPermissions(PermissionsManager.REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
         }
-        if(!isServiceRunning(DataChecker.class)){ button.setText(R.string.start); }
+        if(!isServiceRunning(NetworkChecker.class)){ button.setText(R.string.start); }
         else{ button.setText(R.string.stop); }
     }
 
 
     public void stopDataCheckerService(){
-        Intent intent = new Intent(this, DataChecker.class);
+        Intent intent = new Intent(this, NetworkChecker.class);
         stopService(intent);
 
-        if(!isServiceRunning(DataChecker.class)){ button.setText(R.string.start); }
+        if(!isServiceRunning(NetworkChecker.class)){ button.setText(R.string.start); }
         else{ button.setText(R.string.stop); }
     }
 
@@ -216,6 +217,20 @@ public class MainActivity extends Activity {
                 startDataCheckerService();
             }
         }
+    }
+
+    public boolean getActive() {
+        SharedPreferences sharedPreferences = getSharedPreferences(TILE_PREFERTENCES, MODE_PRIVATE);
+        boolean serviceActive = sharedPreferences.getBoolean(ACTIVE_KEY, false); //false as default
+        return serviceActive;
+    }
+
+
+    public void setActive(boolean active)
+    {
+        SharedPreferences.Editor sharedPreferencesEditor = getSharedPreferences(TILE_PREFERTENCES, MODE_PRIVATE).edit();
+        sharedPreferencesEditor.putBoolean(ACTIVE_KEY, active);
+        sharedPreferencesEditor.apply();
     }
 
 }

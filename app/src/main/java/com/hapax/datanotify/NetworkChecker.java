@@ -28,7 +28,7 @@ import androidx.core.app.ActivityCompat;
 
 import java.lang.reflect.Method;
 
-public class DataChecker extends Service {
+public class NetworkChecker extends Service {
 
     private static final String TAG = "DataChecker";
 
@@ -57,7 +57,7 @@ public class DataChecker extends Service {
     }
 
 
-    public DataChecker() {
+    public NetworkChecker() {
     }
 
     @Override

@@ -53,17 +53,18 @@
             android:layout_centerVertical="true"
             android:orientation="horizontal">
 
-            <CheckBox
-                android:id="@+id/or_better_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </CheckBox>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20dp"
                 android:text="@string/or_better" />
+
+            <CheckBox
+                android:id="@+id/or_better_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </CheckBox>
         </LinearLayout>
 
         <RelativeLayout
@@ -76,7 +77,7 @@
                 android:layout_centerHorizontal="true"
                 android:padding="10dp"
                 android:layout_margin="10dp"
-                android:text="Start">
+                android:text="@string/start">
             </Button>
         </RelativeLayout>
 

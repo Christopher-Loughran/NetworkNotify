@@ -43,7 +43,7 @@ public class NotificationsManager {
 
     public static Notification getServiceNotification(Context context, String text){
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        //TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
 
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0,intent , PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
