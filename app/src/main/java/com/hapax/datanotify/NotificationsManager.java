@@ -12,6 +12,9 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+
+//TODO: something in this class is causes crashes, find out what
+
 public class NotificationsManager {
 
     public static final String NOTIFICATION_CHANNEL_ID = "NOTIFICATION_CHANNEL_ID";
