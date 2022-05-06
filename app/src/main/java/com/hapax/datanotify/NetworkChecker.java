@@ -35,7 +35,7 @@ public class NetworkChecker extends Service {
     public static final String MINIMUM_DATA_LEVEL = "MINIMUM_DATA_LEVEL";
     public static final String OR_BETTER = "OR_BETTER";
 
-    private int minDataLevel = 2;
+    private int minDataLevel = 4;
     private boolean orBetter = true;
 
     private boolean runCheckThread;
@@ -84,7 +84,7 @@ public class NetworkChecker extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        minDataLevel = intent.getIntExtra(MINIMUM_DATA_LEVEL, 2);
+        minDataLevel = intent.getIntExtra(MINIMUM_DATA_LEVEL, 4);
         orBetter = intent.getBooleanExtra(OR_BETTER, true);
 
         runCheckThread = false; // stop thread in case it's running

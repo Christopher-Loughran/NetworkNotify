@@ -1,5 +1,7 @@
 package com.hapax.datanotify;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -17,31 +19,42 @@ public class QuickTile extends TileService {
     private static final String ACTIVE_KEY = "ACTIVE_KEY";
 
     //data checker params
-    private int minDataLevel = 3;
-    private boolean orBetter = false;
+    private int minDataLevel = 4;
+    private boolean orBetter = true;
 
 
     @Override
     public void onCreate(){
+
         NetworkChecker.quickTileCallbacks = new NetworkChecker.QuickTileCallbacks() {
             @Override
             public void onStarted() {
-                setActive(true);
+                Log.w(TAG, "QuickTile onStarted callback");
+                setTileActive(true);
             } //the network checker service has started
 
             @Override
             public void onStopped() {
-                setActive(false);
-            } //the network cheker service has stopped
+                setTileActive(false);
+                Log.w(TAG, "QuickTile onStopped callback");
+            } //the network checker service has stopped
         };
+
+        setTileActive(isServiceRunning(NetworkChecker.class));
+
     }
 
+    @Override
+    public void onStartListening() {
+        super.onStartListening();
+        setTileActive(isServiceRunning(NetworkChecker.class));
+    }
 
     @Override
     public void onClick() { //user clicks the quick tile
         super.onClick();
 
-        if(!getActive()){ //service is not turned on
+        if(!isServiceRunning(NetworkChecker.class)){ //service is not turned on
             if(PermissionsManager.checkPermissions(this, PermissionsManager.REQUIRED_PERMISSIONS)){
                 startDataCheckerService();
             }
@@ -59,7 +72,7 @@ public class QuickTile extends TileService {
     @Override
     public void onTileAdded() {
         super.onTileAdded();
-        setTileActive(getActive());
+        setTileActive(isServiceRunning(NetworkChecker.class));
         //start settings activity so the user can accept the required permissions and set their preferred default settings
         startSettingsActivity();
     }
@@ -107,11 +120,11 @@ public class QuickTile extends TileService {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(intent);
-                setActive(true);
+                setTileActive(true);
             }
             else{
                 startService(intent);
-                setActive(true);
+                setTileActive(true);
             }
         } else {
 
@@ -124,23 +137,19 @@ public class QuickTile extends TileService {
     public void stopDataCheckerService(){
         Intent intent = new Intent(this, NetworkChecker.class);
         stopService(intent);
-        setActive(false);
+        setTileActive(false);
     }
 
 
-    public boolean getActive() {
-        SharedPreferences sharedPreferences = getSharedPreferences(TILE_PREFERTENCES, MODE_PRIVATE);
-        boolean serviceActive = sharedPreferences.getBoolean(ACTIVE_KEY, false); //false as default
-        return serviceActive;
-    }
 
-
-    public void setActive(boolean active)
-    {
-        SharedPreferences.Editor sharedPreferencesEditor = getSharedPreferences(TILE_PREFERTENCES, MODE_PRIVATE).edit();
-        sharedPreferencesEditor.putBoolean(ACTIVE_KEY, active);
-        sharedPreferencesEditor.apply();
-        setTileActive(active);
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -149,15 +158,16 @@ public class QuickTile extends TileService {
             Tile tile = getQsTile();
             if(active){
                 tile.setState(Tile.STATE_ACTIVE);
+                Log.w(TAG, "Setting tile to ACTIVE");
             }
             else{
                 tile.setState(Tile.STATE_INACTIVE);
+                Log.w(TAG, "Setting tile to INACTIVE");
             }
             tile.updateTile();
         }
         catch (NullPointerException e){
             e.printStackTrace();
         }
-
     }
 }
